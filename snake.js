@@ -6,13 +6,13 @@ const LEFT = "left;"
 const UP = "up";
 const DOWN = "down"
 
-let game = setInterval(draw,300);
+let game = setInterval(draw,100);
 
 //player position
 //Point position = new Point(x,y)
-var x = [0];
-var y = [0];
-var direction;
+var x = [40];
+var y = [40];
+var direction = RIGHT;
 
 document.addEventListener("keydown",changeDirection)
 
@@ -43,25 +43,37 @@ function move() {
         case RIGHT: x[0]+=20; break;
         case LEFT: x[0]-=20; break;
     }
-    checkCollisionWithBorder();
+
+
+    if(collisionWithTail() || checkCollisionWithBorder()){
+        die();
+    }
 }
 
 function checkCollisionWithBorder() {
-    if(x[0] < 0)
-        x[0] = 0;
-    if(x[0] > 580)
-        x[0] = 580;
-    if(y[0] < 0)
-        y[0]=0;
-    if(y[0] > 580)
-        y[0]=580;
+
+    if(x[0] < 0){
+        return true;
+    }
+    if(x[0] > 580) {
+        return true;
+    }
+    if(y[0] < 0) {
+        return true;
+    }
+    if(y[0] > 580){
+        return true;
+    }
+
+    return false;
 }
 
 function draw() {
+    move();
     ctx.fillStyle="black";
     ctx.fillRect(0,0,cvs.width, cvs.height);
     drawSnake();    
-    move();
+    
     
 }
 
@@ -77,5 +89,21 @@ function drawSnake(){
         ctx.fillRect(x[i],y[i], 20, 20);
     }
 }
+
+function collisionWithTail() {
+    
+    for(var i = 1; i < x.length; i++) {
+        if(x[0] == x[i] && y[0] == y[i] ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function die() {
+    alert("you died!")
+    location.reload();
+}
+
 
 
