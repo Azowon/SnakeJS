@@ -8,10 +8,14 @@ const DOWN = "down"
 
 let game = setInterval(draw,100);
 
+var foodX = 240;
+var foodY = 280;
+
+
 //player position
 //Point position = new Point(x,y)
-var x = [40];
-var y = [40];
+var x = [20];
+var y = [20];
 var direction = RIGHT;
 
 document.addEventListener("keydown",changeDirection)
@@ -30,6 +34,11 @@ function changeDirection(event) {
 
 function move() {
 
+    if(x[0] == foodX && y[0] == foodY){
+        eat();
+        generateFoodLocation();
+    }
+
 
     for(var i = x.length-1; i>0; i--){
         x[i] = x[i-1];
@@ -45,9 +54,30 @@ function move() {
     }
 
 
-    if(collisionWithTail() || checkCollisionWithBorder()){
+    if(collisionWithTail(x[0], y[0]) || checkCollisionWithBorder()){
         die();
     }
+}
+
+function generateFoodLocation() {
+    
+    
+    foodX = randomNumberInCanvas();
+    foodY = randomNumberInCanvas();
+
+    if(collisionWithTail(foodX, foodY)) {
+        generateFoodLocation;
+    }
+
+    console.log("new food created at: " + foodX+ " " +  foodY)
+
+}
+
+function randomNumberInCanvas() {
+    number = Math.random() * 100;
+    number = Math.round(number);
+    number = number % 30;
+    return number * 20;
 }
 
 function checkCollisionWithBorder() {
@@ -70,12 +100,18 @@ function checkCollisionWithBorder() {
 
 function draw() {
     move();
+
     ctx.fillStyle="black";
     ctx.fillRect(0,0,cvs.width, cvs.height);
-    drawSnake();    
+    drawSnake(); 
+    
+    ctx.fillStyle="green";
+    ctx.fillRect(foodX,foodY,20,20);
     
     
 }
+
+
 
 function eat() {
     x.push(x[x.length-1]);
@@ -90,10 +126,10 @@ function drawSnake(){
     }
 }
 
-function collisionWithTail() {
+function collisionWithTail(a,b) {
     
     for(var i = 1; i < x.length; i++) {
-        if(x[0] == x[i] && y[0] == y[i] ) {
+        if(a == x[i] && b == y[i] ) {
             return true;
         }
     }
@@ -101,7 +137,6 @@ function collisionWithTail() {
 }
 
 function die() {
-    alert("you died!")
     location.reload();
 }
 
