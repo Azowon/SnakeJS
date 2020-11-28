@@ -10,6 +10,8 @@ const UP = "up";
 const DOWN = "down"
 
 var BLOCKED = false;
+var DEAD = false;
+var POINTS = 0;
 
 //start position food
 var foodX = 240;
@@ -28,7 +30,11 @@ let game = setInterval(gameClycle,100);
 document.addEventListener("keydown",changeDirection)
 
 function gameClycle() {
-   console.log("blocked: " + BLOCKED);
+    
+    if(DEAD){
+        showDeathScreen();
+        return;
+    }
     collideWithFood();
     move();
     draw();
@@ -66,7 +72,7 @@ function move() {
     }
 
     if(collisionWithTail(x[0], y[0]) || checkCollisionWithBorder()){
-        die();
+        DEAD = true;
     }
 }
 
@@ -78,9 +84,6 @@ function generateFoodLocation() {
     if(collisionWithTail(foodX, foodY)) {
         generateFoodLocation();
     }
-
-    console.log("new food created at: " + foodX+ " " +  foodY)
-
 }
 
 function draw() {
@@ -88,10 +91,8 @@ function draw() {
     ctx.fillStyle="black";
     ctx.fillRect(0,0,cvs.width, cvs.height);
     drawSnake(); 
-    
-    ctx.fillStyle="green";
-    ctx.fillRect(foodX,foodY,20,20);
-    
+    drawFood();
+    drawPoints();
 }
 
 function drawSnake(){
@@ -101,15 +102,41 @@ function drawSnake(){
     }
 }
 
+function drawFood() {
+    ctx.fillStyle="green";
+    ctx.fillRect(foodX,foodY,20,20);
+}
+
+function drawPoints() {
+    text = POINTS;
+
+    ctx.fillStyle = "white";
+    ctx.font = '60px Arial';
+    ctx.textAlign = "right";
+    ctx.fillText(text, 600,50);
+}
+
 
 function eat() {
     x.push(x[x.length-1]);
     y.push(y[y.length-1])
-    
+    POINTS++;
 }
 
-function die() {
-    location.reload();
+
+function showDeathScreen() {
+    text = "You died!"
+    ctx.clearRect(0, 0, 600, 600);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0,600,600)
+    ctx.fillStyle = 'white';
+    ctx.font = '60px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 300,300);
+    ctx.strokeText(text, 300,300);
+
+    setTimeout(() => {location.reload();}, 2000);
 }
 
 function collisionWithTail(a,b) {
@@ -154,5 +181,3 @@ function randomNumberInCanvas() {
     number = number % 30;
     return number * 20;
 }
-
-
